@@ -1,6 +1,6 @@
 pipeline{
 
-agent any;   ---->> #Default if we want to work in the master or else next line we need to declare as per our requirement 
+agent any;
 
 tools{
 maven'maven3.8.3'
