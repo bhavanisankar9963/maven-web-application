@@ -8,12 +8,13 @@ git branch: 'development', credentialsId: 'ba5febca-5ffe-4a81-b78c-2d1bde777776'
 stage('build'){
 sh "${mavenHome}/bin/mvn clean package"
 }
-
+    
+/*
 stage('ExecuteSonarQubeReport'){
 sh "${mavenHome}/bin/mvn sonar:sonar"
 }
 
-/*
+
 stage('Upload Artifact into nexus'){
 sh "${mavenHome}/bin/mvn deploy"
 }
