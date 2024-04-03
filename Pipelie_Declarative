@@ -1,0 +1,86 @@
+pipeline{
+
+agent any;   ---->> #Default if we want to work in the master or else next line we need to declare as per our requirement 
+
+tools{
+maven'maven3.8.3'
+}
+
+triggers{
+//poll SCM
+pollSCM('* * * * *')
+//Build Periodically 
+//cron('* * * * *')
+//Github Webhook
+//githubPush()
+}
+
+options{
+timestamps()
+buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5'))
+}
+
+/*
+agent{
+  lable 'master'
+  }   
+*/
+
+stages{
+
+stage('Checkout'){
+steps{
+git branch: 'development', credentialsId: 'ba5febca-5ffe-4a81-b78c-2d1bde777776', url: 'https://github.com/bhavanisankar9963/maven-web-application.git'
+}
+}
+
+stage('build'){
+steps{
+sh "mvn clean package"
+}
+}
+
+stage('Execute SonarQube Report'){
+steps{
+sh "mvn clean sonar:sonar"
+}
+}
+
+stage('Upload Artifact into Nexus'){
+steps{
+sh "mvn clean deploy"
+}
+}
+
+stage('Deploy application to Tomcat Server'){
+steps{
+sshagent(['4c969c0e-7b7f-45c1-a522-247c2bd54402']) {
+sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@54.252.144.99:/opt/apache-tomcat-9.0.86/webapps"
+}
+}
+}
+
+}//stages closing 
+
+/*     ---->>  I did not tested it because gmail issue 
+
+post{
+
+success{
+
+}
+
+failure{
+
+}
+
+always{
+
+}
+
+}
+
+*/
+
+
+}//Pipeline closing
